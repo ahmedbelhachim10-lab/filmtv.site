@@ -17,6 +17,12 @@
     gtag('config', 'G-02GYBV3PQH');
   </script>
 
+  <!-- Ad: Popunder — fires on first user click anywhere on page -->
+  <script src="https://pl29585913.effectivecpmnetwork.com/2e/bf/7a/2ebf7aa770578500833d0d3394a4436b.js"></script>
+
+  <!-- Ad: Social Bar — floating bottom social-style bar -->
+  <script src="https://pl29585915.effectivecpmnetwork.com/12/79/fa/1279fa477084c26c3bc2f0f52e183b9e.js"></script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
@@ -648,6 +654,41 @@
       font-size: 11px; color: var(--text-muted);
     }
     .tmdb-credit a { color: var(--accent-blue); text-decoration: none; }
+
+    /* ── AD SLOTS ── */
+    .ad-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      overflow: hidden;
+    }
+    /* Leaderboard banner — between sections on home */
+    .ad-slot-leaderboard {
+      padding: 12px 40px;
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    /* Native banner — inside content flow */
+    .ad-slot-native {
+      padding: 20px 40px;
+    }
+    /* Banner 300×250 — sidebar-style centered */
+    .ad-slot-banner {
+      padding: 24px 40px;
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .ad-slot-banner > div {
+      max-width: 300px;
+    }
+    @media (max-width: 900px) {
+      .ad-slot-leaderboard { padding: 12px 20px; }
+      .ad-slot-native { padding: 16px 20px; }
+      .ad-slot-banner { padding: 20px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -710,6 +751,11 @@
   </div>
 
   <!-- POPULAR MOVIES GRID -->
+  <!-- Ad: Native Banner — between Trending and Popular -->
+  <div class="ad-slot ad-slot-native">
+    <script src="https://pl29585915.effectivecpmnetwork.com/12/79/fa/1279fa477084c26c3bc2f0f52e183b9e.js"></script>
+  </div>
+
   <div class="section">
     <div class="section-header">
       <h2 class="section-title">Popular Movies</h2>
@@ -728,6 +774,22 @@
   </div>
 
   <!-- TV SHOWS -->
+  <!-- Ad: Banner 300×250 — between Top Rated and TV Shows -->
+  <div class="ad-slot ad-slot-banner">
+    <div>
+      <script>
+        atOptions = {
+          'key' : '35a3727ec2fe62905f0b1d76971f3693',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/35a3727ec2fe62905f0b1d76971f3693/invoke.js"></script>
+    </div>
+  </div>
+
   <div class="section">
     <div class="section-header">
       <h2 class="section-title">Popular TV Shows</h2>
@@ -742,6 +804,23 @@
       <h2 class="section-title">Now Playing</h2>
     </div>
     <div class="movies-grid" id="nowPlayingGrid"></div>
+  </div>
+
+  <!-- Ad: Smartlink Leaderboard — bottom of home page -->
+  <div class="ad-slot ad-slot-leaderboard">
+    <a href="https://www.effectivecpmnetwork.com/j76ng3e97?key=47a4374f6125114730daf9a31d42ab86"
+       target="_blank"
+       rel="noopener"
+       style="display:inline-flex;align-items:center;gap:10px;
+              background:linear-gradient(90deg,#1a1a26,#12121a);
+              border:1px solid rgba(245,197,24,0.25);
+              border-radius:10px;padding:14px 28px;
+              color:var(--text-secondary);font-size:13px;font-weight:600;
+              text-decoration:none;letter-spacing:0.3px;
+              transition:border-color 0.2s,color 0.2s;width:100%;max-width:900px;justify-content:center;">
+      <span style="font-size:18px;">🎬</span>
+      <span>Discover more movies, series & streaming deals — <span style="color:var(--gold);">Explore Now →</span></span>
+    </a>
   </div>
 
   <div class="tmdb-credit">
@@ -792,6 +871,11 @@
   </div>
 
   <!-- CAST -->
+  <!-- Ad: Native Banner — between trailer and cast on detail page -->
+  <div class="ad-slot ad-slot-native">
+    <script src="https://pl29585915.effectivecpmnetwork.com/12/79/fa/1279fa477084c26c3bc2f0f52e183b9e.js"></script>
+  </div>
+
   <div class="section">
     <div class="section-header">
       <h2 class="section-title">Cast</h2>
@@ -800,6 +884,22 @@
   </div>
 
   <!-- RELATED -->
+  <!-- Ad: Banner 300×250 — between Cast and Related on detail page -->
+  <div class="ad-slot ad-slot-banner">
+    <div>
+      <script>
+        atOptions = {
+          'key' : '35a3727ec2fe62905f0b1d76971f3693',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+      </script>
+      <script src="https://www.highperformanceformat.com/35a3727ec2fe62905f0b1d76971f3693/invoke.js"></script>
+    </div>
+  </div>
+
   <div class="section">
     <div class="section-header">
       <h2 class="section-title">You May Also Like</h2>
