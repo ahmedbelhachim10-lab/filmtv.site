@@ -690,7 +690,7 @@
       </div>
       <p class="hero-desc" id="heroDesc"></p>
       <div class="hero-btns">
-        <button class="btn-primary" id="heroWatchBtn" onclick="openHeroDetail()">▶ Watch Trailer</button>
+        <button class="btn-primary" id="heroWatchBtn" onclick="openHeroDetail()">▶ Watch Now</button>
         <button class="btn-secondary" id="heroInfoBtn" onclick="openHeroDetail()">ℹ More Info</button>
       </div>
     </div>
@@ -770,7 +770,7 @@
         </div>
         <p class="detail-overview" id="detailOverview"></p>
         <div class="detail-actions">
-          <button class="btn-primary" onclick="scrollToTrailer()">▶ Play Trailer</button>
+          <button class="btn-primary" onclick="scrollToTrailer()">▶ Watch Now</button>
           <button class="btn-secondary" onclick="shareMovie()">↗ Share</button>
         </div>
       </div>
@@ -780,12 +780,12 @@
   <!-- TRAILER -->
   <div class="trailer-section">
     <div class="section-header">
-      <h2 class="section-title">Official Trailer</h2>
+      <h2 class="section-title">Watch Now</h2>
     </div>
     <div class="trailer-wrap" id="trailerWrap">
       <div class="no-trailer">
         <div class="no-trailer-icon">🎬</div>
-        <div>Loading trailer...</div>
+        <div>Loading player...</div>
       </div>
     </div>
   </div>
@@ -1083,11 +1083,10 @@ async function openDetail(id, type='movie') {
   document.getElementById('detailGenres').innerHTML = '';
   document.getElementById('castGrid').innerHTML = '<div class="loader-wrap"><div class="loader"></div></div>';
   document.getElementById('relatedGrid').innerHTML = '';
-  document.getElementById('trailerWrap').innerHTML = '<div class="no-trailer"><div class="no-trailer-icon">⏳</div><div>Loading trailer...</div></div>';
+  document.getElementById('trailerWrap').innerHTML = '<div class="no-trailer"><div class="no-trailer-icon">⏳</div><div>Loading player...</div></div>';
 
-  const [detail, videos, credits, related] = await Promise.all([
+  const [detail, credits, related] = await Promise.all([
     tmdb(`/${type}/${id}`),
-    tmdb(`/${type}/${id}/videos`),
     tmdb(`/${type}/${id}/credits`),
     tmdb(`/${type}/${id}/similar`)
   ]);
@@ -1121,15 +1120,12 @@ async function openDetail(id, type='movie') {
     gWrap.appendChild(tag);
   });
 
-  // Trailer
+  // Player — embed from themoviebox.xyz
   const tw = document.getElementById('trailerWrap');
-  const trailers = (videos?.results||[]).filter(v => v.site==='YouTube' && (v.type==='Trailer'||v.type==='Teaser'));
-  if (trailers.length) {
-    const key = trailers[0].key;
-    tw.innerHTML = `<iframe src="https://www.youtube.com/embed/${key}?rel=0&modestbranding=1&color=white" allowfullscreen loading="lazy" title="${detail.title||detail.name} Trailer"></iframe>`;
-  } else {
-    tw.innerHTML = '<div class="no-trailer"><div class="no-trailer-icon">🎬</div><div style="color:var(--text-muted);font-size:14px;">No official trailer available</div></div>';
-  }
+  const embedBase = type === 'tv'
+    ? `https://www.themoviebox.xyz/embed/tv/${id}`
+    : `https://www.themoviebox.xyz/embed/movie/${id}`;
+  tw.innerHTML = `<iframe src="${embedBase}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture" loading="lazy" title="${detail.title||detail.name} — Watch on FilmTV" referrerpolicy="origin"></iframe>`;
 
   // Cast
   const cg = document.getElementById('castGrid');
