@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -647,34 +648,11 @@
       font-size: 11px; color: var(--text-muted);
     }
     .tmdb-credit a { color: var(--accent-blue); text-decoration: none; }
-
-    /* ── SERVER TABS ── */
-    .server-tab {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 16px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-secondary);
-      font-size: 13px; font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: var(--font-body);
-      white-space: nowrap;
-    }
-    .server-tab:hover { border-color: var(--gold-dim); color: var(--text-primary); }
-    .server-tab.active {
-      background: var(--gold); border-color: var(--gold);
-      color: #060608;
-    }
-    .server-tab .srv-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: currentColor; opacity: 0.6;
-    }
-    .server-tab.active .srv-dot { opacity: 1; }
   </style>
 </head>
 <body>
+
+<div style="display:none;">ORN402</div>
 
 <!-- NAV -->
 <nav id="mainNav">
@@ -715,7 +693,7 @@
       </div>
       <p class="hero-desc" id="heroDesc"></p>
       <div class="hero-btns">
-        <button class="btn-primary" id="heroWatchBtn" onclick="openHeroDetail()">▶ Watch Now</button>
+        <button class="btn-primary" id="heroWatchBtn" onclick="openHeroDetail()">▶ Watch Trailer</button>
         <button class="btn-secondary" id="heroInfoBtn" onclick="openHeroDetail()">ℹ More Info</button>
       </div>
     </div>
@@ -802,51 +780,17 @@
     </div>
   </div>
 
-  <!-- PLAYER SECTION -->
+  <!-- TRAILER -->
   <div class="trailer-section">
     <div class="section-header">
-      <h2 class="section-title">Watch Now</h2>
+      <h2 class="section-title">Official Trailer</h2>
     </div>
-
-    <!-- Server selector tabs -->
-    <div id="serverTabs" style="
-      display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;
-    "></div>
-
-    <!-- TV episode selector (hidden for movies) -->
-    <div id="episodeSelector" style="display:none; gap:12px; margin-bottom:16px; align-items:center; flex-wrap:wrap;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <label style="font-size:13px; color:var(--text-secondary); white-space:nowrap;">Season</label>
-        <select id="seasonSelect" onchange="onSeasonChange()" style="
-          background:var(--bg-elevated); border:1px solid var(--border);
-          color:var(--text-primary); padding:7px 12px; border-radius:8px;
-          font-size:13px; font-family:var(--font-body); outline:none; cursor:pointer;
-        "></select>
-      </div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <label style="font-size:13px; color:var(--text-secondary); white-space:nowrap;">Episode</label>
-        <select id="episodeSelect" onchange="onEpisodeChange()" style="
-          background:var(--bg-elevated); border:1px solid var(--border);
-          color:var(--text-primary); padding:7px 12px; border-radius:8px;
-          font-size:13px; font-family:var(--font-body); outline:none; cursor:pointer;
-        "></select>
-      </div>
-    </div>
-
     <div class="trailer-wrap" id="trailerWrap">
       <div class="no-trailer">
         <div class="no-trailer-icon">🎬</div>
-        <div>Select a movie to start watching</div>
+        <div>Loading trailer...</div>
       </div>
     </div>
-
-    <!-- Player note -->
-    <p id="playerNote" style="
-      margin-top:12px; font-size:12px; color:var(--text-muted);
-      display:none; line-height:1.6;
-    ">
-      💡 If a server doesn't load, try another one above. All streams are sourced from third-party providers.
-    </p>
   </div>
 
   <!-- CAST -->
@@ -1130,186 +1074,32 @@ function openHeroDetail() {
 }
 
 // ═══════════════════════════════════════════
-// MULTI-SOURCE PLAYER CONFIG
-// 6 providers — TMDB ID & IMDB ID based
-// Failover: user clicks another server if one is down
-// ═══════════════════════════════════════════
-let currentIMDBid   = null;
-let currentTMDBid   = null;
-let currentSeason   = 1;
-let currentEpisode  = 1;
-let currentServers  = [];
-let activeServer    = 0;
-let detailSeasons   = [];
-
-// Server definitions — name shown to user, URL builder
-const SERVERS = [
-  {
-    name: 'Server 1',
-    icon: '▶',
-    movie: (tmdb, imdb) => `https://vidsrc.mov/embed/movie/${imdb || tmdb}`,
-    tv:    (tmdb, imdb, s, e) => `https://vidsrc.mov/embed/tv/${imdb || tmdb}/${s}/${e}`
-  },
-  {
-    name: 'Server 2',
-    icon: '▶',
-    movie: (tmdb, imdb) => `https://vidsrc.me/embed/movie?tmdb=${tmdb}`,
-    tv:    (tmdb, imdb, s, e) => `https://vidsrc.me/embed/tv?tmdb=${tmdb}&season=${s}&episode=${e}`
-  },
-  {
-    name: 'Server 3',
-    icon: '▶',
-    movie: (tmdb, imdb) => `https://www.themoviebox.xyz/embed/movie/${tmdb}`,
-    tv:    (tmdb, imdb, s, e) => `https://www.themoviebox.xyz/embed/tv/${tmdb}/${s}/${e}`
-  },
-  {
-    name: 'Server 4',
-    icon: '▶',
-    movie: (tmdb, imdb) => `https://multiembed.mov/?video_id=${tmdb}&tmdb=1`,
-    tv:    (tmdb, imdb, s, e) => `https://multiembed.mov/?video_id=${tmdb}&tmdb=1&s=${s}&e=${e}`
-  },
-  {
-    name: 'Server 5',
-    icon: '▶',
-    movie: (tmdb, imdb) => `https://embed.su/embed/movie/${tmdb}`,
-    tv:    (tmdb, imdb, s, e) => `https://embed.su/embed/tv/${tmdb}/${s}/${e}`
-  },
-  {
-    name: 'Server 6',
-    icon: '▶',
-    movie: (tmdb, imdb) => `https://autoembed.cc/movie/tmdb-${tmdb}`,
-    tv:    (tmdb, imdb, s, e) => `https://autoembed.cc/tv/tmdb-${tmdb}-${s}-${e}`
-  }
-];
-
-function buildServerURL(serverIdx) {
-  const srv = SERVERS[serverIdx];
-  if (currentDetailType === 'tv') {
-    return srv.tv(currentTMDBid, currentIMDBid, currentSeason, currentEpisode);
-  }
-  return srv.movie(currentTMDBid, currentIMDBid);
-}
-
-function renderServerTabs() {
-  const wrap = document.getElementById('serverTabs');
-  wrap.innerHTML = '';
-  SERVERS.forEach((srv, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'server-tab' + (i === activeServer ? ' active' : '');
-    btn.innerHTML = `<span class="srv-dot"></span>${srv.name}`;
-    btn.onclick = () => switchServer(i);
-    wrap.appendChild(btn);
-  });
-}
-
-function switchServer(idx) {
-  activeServer = idx;
-  renderServerTabs();
-  loadPlayer();
-}
-
-function loadPlayer() {
-  const tw = document.getElementById('trailerWrap');
-  const url = buildServerURL(activeServer);
-  tw.innerHTML = `<iframe
-    src="${url}"
-    allowfullscreen
-    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-    loading="lazy"
-    referrerpolicy="origin"
-    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-    title="Watch — FilmTV"
-  ></iframe>`;
-  document.getElementById('playerNote').style.display = 'block';
-}
-
-// TV: season/episode selectors
-async function buildEpisodeSelectors(tmdbId) {
-  const detail = await tmdb(`/tv/${tmdbId}`);
-  if (!detail) return;
-  detailSeasons = (detail.seasons || []).filter(s => s.season_number > 0);
-
-  const sSelect = document.getElementById('seasonSelect');
-  sSelect.innerHTML = '';
-  detailSeasons.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.season_number;
-    opt.textContent = `Season ${s.season_number}`;
-    sSelect.appendChild(opt);
-  });
-  sSelect.value = 1;
-  currentSeason = 1;
-  await buildEpisodeOptions(tmdbId, 1);
-  document.getElementById('episodeSelector').style.display = 'flex';
-}
-
-async function buildEpisodeOptions(tmdbId, seasonNum) {
-  const seasonData = await tmdb(`/tv/${tmdbId}/season/${seasonNum}`);
-  const eSelect = document.getElementById('episodeSelect');
-  eSelect.innerHTML = '';
-  if (seasonData && seasonData.episodes) {
-    seasonData.episodes.forEach(ep => {
-      const opt = document.createElement('option');
-      opt.value = ep.episode_number;
-      opt.textContent = `Ep ${ep.episode_number}: ${ep.name}`;
-      eSelect.appendChild(opt);
-    });
-  }
-  eSelect.value = 1;
-  currentEpisode = 1;
-}
-
-async function onSeasonChange() {
-  currentSeason = parseInt(document.getElementById('seasonSelect').value);
-  currentEpisode = 1;
-  await buildEpisodeOptions(currentTMDBid, currentSeason);
-  loadPlayer();
-}
-
-function onEpisodeChange() {
-  currentEpisode = parseInt(document.getElementById('episodeSelect').value);
-  loadPlayer();
-}
-
-// ═══════════════════════════════════════════
 // DETAIL PAGE
 // ═══════════════════════════════════════════
 async function openDetail(id, type='movie') {
   showPage('detail');
   currentDetailType = type;
-  currentTMDBid     = id;
-  currentIMDBid     = null;
-  currentSeason     = 1;
-  currentEpisode    = 1;
-  activeServer      = 0;
 
-  // Reset UI
-  document.getElementById('detailTitle').textContent    = 'Loading...';
+  // Clear old
+  document.getElementById('detailTitle').textContent = 'Loading...';
   document.getElementById('detailOverview').textContent = '';
-  document.getElementById('detailGenres').innerHTML     = '';
-  document.getElementById('castGrid').innerHTML         = '<div class="loader-wrap"><div class="loader"></div></div>';
-  document.getElementById('relatedGrid').innerHTML      = '';
-  document.getElementById('episodeSelector').style.display = 'none';
-  document.getElementById('serverTabs').innerHTML       = '';
-  document.getElementById('playerNote').style.display   = 'none';
-  document.getElementById('trailerWrap').innerHTML      =
-    '<div class="no-trailer"><div class="no-trailer-icon">⏳</div><div>Loading player...</div></div>';
+  document.getElementById('detailGenres').innerHTML = '';
+  document.getElementById('castGrid').innerHTML = '<div class="loader-wrap"><div class="loader"></div></div>';
+  document.getElementById('relatedGrid').innerHTML = '';
+  document.getElementById('trailerWrap').innerHTML = '<div class="no-trailer"><div class="no-trailer-icon">⏳</div><div>Loading trailer...</div></div>';
 
-  const [detail, credits, related] = await Promise.all([
+  const [detail, videos, credits, related] = await Promise.all([
     tmdb(`/${type}/${id}`),
+    tmdb(`/${type}/${id}/videos`),
     tmdb(`/${type}/${id}/credits`),
     tmdb(`/${type}/${id}/similar`)
   ]);
 
   if (!detail) { toast('Failed to load details'); return; }
 
-  // Store IMDB id for servers that prefer it
-  currentIMDBid = detail.imdb_id || detail.external_ids?.imdb_id || null;
-
   // Background
   if (detail.backdrop_path) {
-    document.getElementById('detailBg').style.backgroundImage =
-      `url(${img(detail.backdrop_path,'original')})`;
+    document.getElementById('detailBg').style.backgroundImage = `url(${img(detail.backdrop_path,'original')})`;
   }
 
   // Poster
@@ -1317,14 +1107,12 @@ async function openDetail(id, type='movie') {
   document.getElementById('detailPoster').alt = detail.title || detail.name;
 
   // Title / meta
-  document.getElementById('detailTitle').textContent    = detail.title || detail.name;
-  document.getElementById('detailRating').textContent   = (detail.vote_average/2).toFixed(1);
-  document.getElementById('detailYear').textContent     = year(detail.release_date || detail.first_air_date);
-  const rt = detail.runtime
-    ? `${detail.runtime} min`
-    : (detail.episode_run_time ? detail.episode_run_time[0]+' min/ep' : '—');
-  document.getElementById('detailRuntime').textContent  = rt;
-  document.getElementById('detailLang').textContent     = (detail.original_language||'').toUpperCase();
+  document.getElementById('detailTitle').textContent = detail.title || detail.name;
+  document.getElementById('detailRating').textContent = (detail.vote_average/2).toFixed(1);
+  document.getElementById('detailYear').textContent   = year(detail.release_date || detail.first_air_date);
+  const rt = detail.runtime ? `${detail.runtime} min` : (detail.episode_run_time ? detail.episode_run_time[0]+' min/ep' : '—');
+  document.getElementById('detailRuntime').textContent = rt;
+  document.getElementById('detailLang').textContent   = (detail.original_language||'').toUpperCase();
   document.getElementById('detailOverview').textContent = detail.overview || 'No description available.';
 
   // Genres
@@ -1336,13 +1124,14 @@ async function openDetail(id, type='movie') {
     gWrap.appendChild(tag);
   });
 
-  // Build server tabs & load player
-  renderServerTabs();
-  loadPlayer();
-
-  // TV: build season/episode selectors
-  if (type === 'tv') {
-    buildEpisodeSelectors(id);
+  // Trailer
+  const tw = document.getElementById('trailerWrap');
+  const trailers = (videos?.results||[]).filter(v => v.site==='YouTube' && (v.type==='Trailer'||v.type==='Teaser'));
+  if (trailers.length) {
+    const key = trailers[0].key;
+    tw.innerHTML = `<iframe src="https://www.youtube.com/embed/${key}?rel=0&modestbranding=1&color=white" allowfullscreen loading="lazy" title="${detail.title||detail.name} Trailer"></iframe>`;
+  } else {
+    tw.innerHTML = '<div class="no-trailer"><div class="no-trailer-icon">🎬</div><div style="color:var(--text-muted);font-size:14px;">No official trailer available</div></div>';
   }
 
   // Cast
@@ -1351,13 +1140,8 @@ async function openDetail(id, type='movie') {
   (credits?.cast||[]).slice(0,20).forEach(p => {
     const el = document.createElement('div');
     el.className = 'cast-card';
-    const imgSrc = p.profile_path
-      ? img(p.profile_path,'w185')
-      : `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%231a1a26'/%3E%3Ctext x='50%25' y='50%25' font-size='28' dominant-baseline='middle' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E`;
-    el.innerHTML = `
-      <img class="cast-img" src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.src='${NO_IMG}'"/>
-      <div class="cast-name">${p.name}</div>
-      <div class="cast-role">${p.character||''}</div>`;
+    const imgSrc = p.profile_path ? img(p.profile_path,'w185') : `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%231a1a26'/%3E%3Ctext x='50%25' y='50%25' font-size='28' dominant-baseline='middle' text-anchor='middle'%3E👤%3C/text%3E%3C/svg%3E`;
+    el.innerHTML = `<img class="cast-img" src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.src='${NO_IMG}'"/><div class="cast-name">${p.name}</div><div class="cast-role">${p.character||''}</div>`;
     cg.appendChild(el);
   });
 
